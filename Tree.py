@@ -21,7 +21,7 @@ class TreeContainer:
     def __init__(self):
         # ultimate parent isn't counted as a real node. It is only here so the root node also has a parent,
         #  which makes implementation easier.
-        self.ultimate_parent = TreeNode(False, None, pass_through, 1)
+        self.ultimate_parent = TreeNode(False, None, (pass_through, 1))
         self.list_of_nodes = list()
     
 
@@ -54,13 +54,12 @@ class TreeContainer:
 
 class TreeNode:
 
-    # The function you pass has to ba a tupple of the form: (function, num_of_args_of__this_function)
-    def __init__(self, is_leaf: bool, numeric_vector=None, elem_func=None, elem_func_num_of_args=0):
+    # The function you pass has to ba a tuple of the form: (function, num_of_args_of__this_function)
+    def __init__(self, is_leaf: bool, numeric_vector, elem_func_tuple=(None, 0)):
         self.is_leaf = is_leaf
         self.numeric_vector = numeric_vector
 
-        self.elem_func = elem_func
-        self.elem_func_num_of_args = elem_func_num_of_args
+        self.elem_func_tuple = elem_func_tuple
 
         self.parent = None
         self.children = [None, None]
@@ -69,16 +68,16 @@ class TreeNode:
     def calculate_subtree(self):
         if(self.is_leaf):
             return self.numeric_vector
-        elif(self.elem_func_num_of_args == 1):
-            return self.elem_func(self.children[0].calculate_subtree())
-        elif(self.elem_func_num_of_args == 2):
-            return self.elem_func(self.children[0].calculate_subtree(), self.children[1].calculate_subtree())
+        elif(self.elem_func_tuple[1] == 1):
+            return self.elem_func_tuple[0](self.children[0].calculate_subtree())
+        elif(self.elem_func_tuple[1] == 2):
+            return self.elem_func_tuple[0](self.children[0].calculate_subtree(), self.children[1].calculate_subtree())
         else:
-            print("This (" + str(self) + ") is not a leaf and has " + str(self.elem_func_num_of_args) + "as elem_func_num_of_args, which is different from 1 or 2.")
+            print("This (" + str(self) + ") is not a leaf and has " + str(self.elem_func_tuple[1]) + "as elem_func_tuple[1], which is different from 1 or 2.")
     
 
     def copy_without_parent_and_children(self):
-        new_self = TreeNode(self.is_leaf, self.numeric_vector, self.elem_func, self.elem_func_num_of_args)
+        new_self = TreeNode(self.is_leaf, self.numeric_vector, self.elem_func_tuple)
         return new_self
     
     def set_left_child(self, adding_node):
@@ -100,7 +99,7 @@ def append_nodes_from_subtree_to_list(subtree_root: TreeNode, goal_list: list):
         if subtree_root == None:
             return
         
-        goal_list.add(subtree_root)
+        goal_list.append(subtree_root)
 
         append_nodes_from_subtree_to_list(subtree_root.children[0], goal_list)
         append_nodes_from_subtree_to_list(subtree_root.children[1], goal_list)
@@ -187,7 +186,7 @@ def print_subtree(subtree_root: TreeNode, level_tuple=()):
         print(subtree_root.numeric_vector)
     else:
         print(str(level_tuple) + ":")
-        print(subtree_root.elem_func)
+        print(subtree_root.elem_func_tuple)
     
     print(subtree_root.parent)
     
@@ -245,9 +244,9 @@ testing_tree = TreeContainer()
 const_5 = 5 * np.ones(10)
 const_4 = 4 * np.ones(10)
 const_2 = 2 * np.ones(10)
-testing_tree.ultimate_parent.set_left_child(TreeNode(False, None, addition, 2))
+testing_tree.ultimate_parent.set_left_child(TreeNode(False, None, (addition, 2)))
 testing_tree.ultimate_parent.children[0].set_left_child(TreeNode(True, const_5))
-testing_tree.ultimate_parent.children[0].set_right_child(TreeNode(False, None, division, 2))
+testing_tree.ultimate_parent.children[0].set_right_child(TreeNode(False, None, (division, 2)))
 testing_tree.ultimate_parent.children[0].children[1].set_left_child(TreeNode(True, const_4))
 testing_tree.ultimate_parent.children[0].children[1].set_right_child(TreeNode(True, const_2))
 
@@ -289,9 +288,9 @@ testing_tree_2 = TreeContainer()
 const_5 = 5 * np.ones(10)
 const_4 = 4 * np.ones(10)
 const_2 = 2 * np.ones(10)
-testing_tree_2.ultimate_parent.set_left_child(TreeNode(False, None, addition, 2))
+testing_tree_2.ultimate_parent.set_left_child(TreeNode(False, None, (addition, 2)))
 testing_tree_2.ultimate_parent.children[0].set_left_child(TreeNode(True, const_5))
-testing_tree_2.ultimate_parent.children[0].set_right_child(TreeNode(False, None, division, 2))
+testing_tree_2.ultimate_parent.children[0].set_right_child(TreeNode(False, None, (division, 2)))
 testing_tree_2.ultimate_parent.children[0].children[1].set_left_child(TreeNode(True, const_4))
 testing_tree_2.ultimate_parent.children[0].children[1].set_right_child(TreeNode(True, const_2))
 
