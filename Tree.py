@@ -3,12 +3,7 @@
 
 
 
-
-
-
-
 import random
-
 import numpy as np
 
 
@@ -146,7 +141,8 @@ class TreeNode:
 
         
 
-
+# The pointers to the nodes in a subtree get added to the list you pass as an argument.
+# This is useful for choosing a random node on which a mutation or crossover will happen.
 def append_nodes_from_subtree_to_list(subtree_root: TreeNode, goal_list: list):
         
         if subtree_root == None:
@@ -162,8 +158,8 @@ def append_nodes_from_subtree_to_list(subtree_root: TreeNode, goal_list: list):
 
 
 
-
-# Watch out, because root has no parent. You need to assign it's parent to wherever you are copying to.
+# Returns a tree node that has the rest of the subtree tied to it.
+# Watch out, because the root you get returned has no parent. You need to assign it's parent to wherever you are copying to.
 def copy_subtree(subtree_root: TreeNode):
 
     if subtree_root == None:
@@ -182,8 +178,39 @@ def copy_subtree(subtree_root: TreeNode):
         new_right_subtree.parent = new_current_node
     
     return new_current_node
-    
 
+
+# Recurssively prints out the tree. Root node is represented by ().
+# Following steps to the left and right are represented with "L" and "R" respectively.
+def print_subtree(subtree_root: TreeNode, level_tuple=()):
+
+    if subtree_root == None:
+        return
+
+    if subtree_root.is_leaf:
+        print(str(level_tuple) + ":")
+        print(subtree_root.numeric_vector)
+    else:
+        print(str(level_tuple) + ":")
+        print(subtree_root.elem_func_tuple)
+    
+    print(subtree_root.parent)
+    
+    level_tuple_left = (level_tuple, "L")
+    print_subtree(subtree_root.children[0], level_tuple_left)
+    level_tuple_right = (level_tuple, "R")
+    print_subtree(subtree_root.children[1], level_tuple_right)
+
+    return
+
+
+
+
+
+
+
+# Returns two TreeContainer objects, which are the offsprings of the crossover.
+# It leaves the parents you passed intact.
 def crossover(coparent_1: TreeContainer, coparent_2: TreeContainer):
 
         # Since we want to keep the parent trees the same because we might want to use elitism in our algorithm, we will make new trees.
@@ -228,29 +255,6 @@ def crossover(coparent_1: TreeContainer, coparent_2: TreeContainer):
 
 
         return parent_tree_1, parent_tree_2
-
-def print_subtree(subtree_root: TreeNode, level_tuple=()):
-
-    if subtree_root == None:
-        return
-
-    if subtree_root.is_leaf:
-        print(str(level_tuple) + ":")
-        print(subtree_root.numeric_vector)
-    else:
-        print(str(level_tuple) + ":")
-        print(subtree_root.elem_func_tuple)
-    
-    print(subtree_root.parent)
-    
-    level_tuple_left = (level_tuple, "L")
-    print_subtree(subtree_root.children[0], level_tuple_left)
-    level_tuple_right = (level_tuple, "R")
-    print_subtree(subtree_root.children[1], level_tuple_right)
-
-    return
-
-
 
 
 
