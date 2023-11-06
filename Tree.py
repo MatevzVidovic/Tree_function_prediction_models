@@ -19,21 +19,29 @@ import numpy as np
 class TreeContainer:
 
     def __init__(self):
-        # ultimate parent isn't counted as a real node. It is only here so the root node also has a parent, which makes implementation easier.
+        # ultimate parent isn't counted as a real node. It is only here so the root node also has a parent,
+        #  which makes implementation easier.
         self.ultimate_parent = TreeNode(False, None, pass_through, 1)
-        self.set_of_nodes = set()
+        self.list_of_nodes = list()
     
 
     def copy(self):
         new_self = TreeContainer()
-        new_self.ultimate_parent.child_one = copy_subtree(self.ultimate_parent.child_one)
-        new_self.ultimate_parent.child_one.parent_node = new_self.ultimate_parent
-        add_nodes_from_subtree_to_set(new_self.ultimate_parent.child_one, new_self.set_of_nodes)
+        new_self.ultimate_parent.children[0] = copy_subtree(self.ultimate_parent.children[0])
+        new_self.ultimate_parent.children[0].parent = new_self.ultimate_parent
+        append_nodes_from_subtree_to_list(new_self.ultimate_parent.children[0], new_self.list_of_nodes)
 
         return new_self
+    
+    def calculate(self):
+        return self.ultimate_parent.children[0].calculate_subtree()
 
     
-    
+    # def simple_mutation(self, possible_functions: list, respective_nums_of_args: list, possible_numeric_vectors: list):
+    #     mutation_node = random.choice(self.list_of_nodes)
+
+    #     if mutation_node.is_leaf:
+    #         numeric_array_length = mutation_node.
 
 
     # def mutation
@@ -45,6 +53,8 @@ class TreeContainer:
 
 
 class TreeNode:
+
+    # The function you pass has to ba a tupple of the form: (function, num_of_args_of__this_function)
     def __init__(self, is_leaf: bool, numeric_vector=None, elem_func=None, elem_func_num_of_args=0):
         self.is_leaf = is_leaf
         self.numeric_vector = numeric_vector
@@ -52,47 +62,53 @@ class TreeNode:
         self.elem_func = elem_func
         self.elem_func_num_of_args = elem_func_num_of_args
 
-        self.parent_node = None
-        self.child_one = None
-        self.child_two = None
+        self.parent = None
+        self.children = [None, None]
     
-    def calculate(self):
+
+    def calculate_subtree(self):
         if(self.is_leaf):
             return self.numeric_vector
+        elif(self.elem_func_num_of_args == 1):
+            return self.elem_func(self.children[0].calculate_subtree())
         elif(self.elem_func_num_of_args == 2):
-            return self.elem_func(self.child_one.calculate(), self.child_two.calculate()) 
+            return self.elem_func(self.children[0].calculate_subtree(), self.children[1].calculate_subtree())
         else:
-            return self.elem_func(self.child_one.calculate())
+            print("This (" + str(self) + ") is not a leaf and has " + str(self.elem_func_num_of_args) + "as elem_func_num_of_args, which is different from 1 or 2.")
     
+
     def copy_without_parent_and_children(self):
         new_self = TreeNode(self.is_leaf, self.numeric_vector, self.elem_func, self.elem_func_num_of_args)
         return new_self
     
-    def add_left_child(self, adding_node):
-        self.child_one = adding_node
-        adding_node.parent_node = self
+    def set_left_child(self, adding_node):
+        self.children[0] = adding_node
+        adding_node.parent = self
         return
     
-    def add_right_child(self, adding_node):
-        self.child_two = adding_node
-        adding_node.parent_node = self
+    def set_right_child(self, adding_node):
+        self.children[1] = adding_node
+        adding_node.parent = self
         return
 
 
         
 
 
-def add_nodes_from_subtree_to_set(subtree_root: TreeNode, goal_set: set):
+def append_nodes_from_subtree_to_list(subtree_root: TreeNode, goal_list: list):
         
         if subtree_root == None:
             return
         
-        goal_set.add(subtree_root)
+        goal_list.add(subtree_root)
 
-        add_nodes_from_subtree_to_set(subtree_root.child_one, goal_set)
-        add_nodes_from_subtree_to_set(subtree_root.child_two, goal_set)
+        append_nodes_from_subtree_to_list(subtree_root.children[0], goal_list)
+        append_nodes_from_subtree_to_list(subtree_root.children[1], goal_list)
 
         return
+
+
+
 
 
 # Watch out, because root has no parent. You need to assign it's parent to wherever you are copying to.
@@ -103,15 +119,15 @@ def copy_subtree(subtree_root: TreeNode):
 
     new_current_node = subtree_root.copy_without_parent_and_children()
 
-    if subtree_root.child_one != None:
-        new_left_subtree = copy_subtree(subtree_root.child_one)
-        new_current_node.child_one = new_left_subtree
-        new_left_subtree.parent_node = new_current_node
+    if subtree_root.children[0] != None:
+        new_left_subtree = copy_subtree(subtree_root.children[0])
+        new_current_node.children[0] = new_left_subtree
+        new_left_subtree.parent = new_current_node
 
-    if subtree_root.child_two != None:
-        new_right_subtree = copy_subtree(subtree_root.child_two)
-        new_current_node.child_two = new_right_subtree
-        new_right_subtree.parent_node = new_current_node
+    if subtree_root.children[1] != None:
+        new_right_subtree = copy_subtree(subtree_root.children[1])
+        new_current_node.children[1] = new_right_subtree
+        new_right_subtree.parent = new_current_node
     
     return new_current_node
     
@@ -123,60 +139,40 @@ def crossover(coparent_1: TreeContainer, coparent_2: TreeContainer):
         parent_tree_2 = coparent_2.copy()
 
 
-        # selects a random element of the set
-        # You can't use random.choice on sets anymore, so we convert it to a tuple first.
-        exchanged_node_1 = random.choice(tuple(parent_tree_1.set_of_nodes))
-        exchanged_node_2 = random.choice(tuple(parent_tree_2.set_of_nodes))
+        # selects a random element of the list
+        exchanged_node_1 = random.choice(parent_tree_1.list_of_nodes)
+        exchanged_node_2 = random.choice(parent_tree_2.list_of_nodes)
 
         
+        parent_node_1 = exchanged_node_1.parent
+        parent_node_2 = exchanged_node_2.parent
 
 
-
+        # We have to find which of the parent's children is being replaced, and replace it with the new node.
         # e.g. parent_node_1 has two children. We need to find out which of these two children is exchange_node_1.
-        # This child will then be replaced.
-        # exchange_node_2 will take that place. And vice versa will happen for parent_node_2 and exchange_node_1.
-
-        parent_node_1 = exchanged_node_1.parent_node
-        parent_node_2 = exchanged_node_2.parent_node
-
-
-        exchanged_node_1.parent_node = parent_node_2
-
-        # try:
-        #     parent_node_2_takes_child_one = parent_node_2.child_one == exchanged_node_1
-        # except:
-        #     print()
-        #     print()
-        #     print(exchanged_node_2)
-        #     print_subtree(parent_tree_2.ultimate_parent.child_one)
-        #     # print(parent_node_2)
-
-        parent_node_2_takes_child_one = parent_node_2.child_one == exchanged_node_1
-
-
-        if (parent_node_2_takes_child_one):
-            parent_node_2.child_one = exchanged_node_1
+        # This child will then be replaced with exchange_node_2.
+        if (parent_node_1.children[0] == exchanged_node_1):
+            parent_node_1.children[0] = exchanged_node_2
         else:
-            parent_node_2.child_two = exchanged_node_1
+            parent_node_1.children[1] = exchanged_node_2
 
-
-
-        exchanged_node_2.parent_node = parent_node_1
-
-        parent_node_1_takes_child_one = parent_node_1.child_one == exchanged_node_1
-        
-        if (parent_node_1_takes_child_one):
-            parent_node_1.child_one = exchanged_node_2
+        # We do the same for parent_node_2 and exchange_node_2     
+        if (parent_node_2.children[0] == exchanged_node_2):
+            parent_node_2.children[0] = exchanged_node_1
         else:
-            parent_node_1.child_two = exchanged_node_2
+            parent_node_2.children[1] = exchanged_node_1
         
 
+        # We also correct the parents of our exchanged nodes.
+        exchanged_node_1.parent = parent_node_2
+        exchanged_node_2.parent = parent_node_1
 
 
-        parent_tree_1.set_of_nodes = set()
-        parent_tree_2.set_of_nodes = set()
-        add_nodes_from_subtree_to_set(parent_tree_1.ultimate_parent.child_one, parent_tree_1.set_of_nodes)
-        add_nodes_from_subtree_to_set(parent_tree_2.ultimate_parent.child_one, parent_tree_2.set_of_nodes)
+        # We empty the lists of nodes of our new trees, and we build them again.
+        parent_tree_1.list_of_nodes = list()
+        parent_tree_2.list_of_nodes = list()
+        append_nodes_from_subtree_to_list(parent_tree_1.ultimate_parent.children[0], parent_tree_1.list_of_nodes)
+        append_nodes_from_subtree_to_list(parent_tree_2.ultimate_parent.children[0], parent_tree_2.list_of_nodes)
 
 
         return parent_tree_1, parent_tree_2
@@ -193,12 +189,12 @@ def print_subtree(subtree_root: TreeNode, level_tuple=()):
         print(str(level_tuple) + ":")
         print(subtree_root.elem_func)
     
-    print(subtree_root.parent_node)
+    print(subtree_root.parent)
     
     level_tuple_left = (level_tuple, "L")
-    print_subtree(subtree_root.child_one, level_tuple_left)
+    print_subtree(subtree_root.children[0], level_tuple_left)
     level_tuple_right = (level_tuple, "R")
-    print_subtree(subtree_root.child_two, level_tuple_right)
+    print_subtree(subtree_root.children[1], level_tuple_right)
 
     return
 
@@ -249,38 +245,40 @@ testing_tree = TreeContainer()
 const_5 = 5 * np.ones(10)
 const_4 = 4 * np.ones(10)
 const_2 = 2 * np.ones(10)
-testing_tree.ultimate_parent.add_left_child(TreeNode(False, None, addition, 2))
-testing_tree.ultimate_parent.child_one.add_left_child(TreeNode(True, const_5))
-testing_tree.ultimate_parent.child_one.add_right_child(TreeNode(False, None, division, 2))
-testing_tree.ultimate_parent.child_one.child_two.add_left_child(TreeNode(True, const_4))
-testing_tree.ultimate_parent.child_one.child_two.add_right_child(TreeNode(True, const_2))
+testing_tree.ultimate_parent.set_left_child(TreeNode(False, None, addition, 2))
+testing_tree.ultimate_parent.children[0].set_left_child(TreeNode(True, const_5))
+testing_tree.ultimate_parent.children[0].set_right_child(TreeNode(False, None, division, 2))
+testing_tree.ultimate_parent.children[0].children[1].set_left_child(TreeNode(True, const_4))
+testing_tree.ultimate_parent.children[0].children[1].set_right_child(TreeNode(True, const_2))
 
-print(testing_tree.ultimate_parent.child_one.calculate())
-print(testing_tree.ultimate_parent.calculate())
+print(testing_tree.calculate())
 
-print(testing_tree.ultimate_parent.child_one.child_two.calculate())
+print(testing_tree.ultimate_parent.children[0].calculate_subtree())
+print(testing_tree.ultimate_parent.calculate_subtree())
 
-testing_set = set()
-add_nodes_from_subtree_to_set(testing_tree.ultimate_parent.child_one.child_two, testing_set)
+print(testing_tree.ultimate_parent.children[0].children[1].calculate_subtree())
+
+testing_list = list()
+append_nodes_from_subtree_to_list(testing_tree.ultimate_parent.children[0].children[1], testing_list)
 # should be 3
-print(len(testing_set))
-print(testing_set)
+print(len(testing_list))
+print(testing_list)
 
 
-testing_set = set()
-add_nodes_from_subtree_to_set(testing_tree.ultimate_parent.child_one.child_one, testing_set)
+testing_list = list()
+append_nodes_from_subtree_to_list(testing_tree.ultimate_parent.children[0].children[0], testing_list)
 # should be 1
-print(len(testing_set))
-print(testing_set)
+print(len(testing_list))
+print(testing_list)
 
 
-testing_set = set()
-add_nodes_from_subtree_to_set(testing_tree.ultimate_parent.child_one, testing_set)
+testing_list = list()
+append_nodes_from_subtree_to_list(testing_tree.ultimate_parent.children[0], testing_list)
 # should be 5
-print(len(testing_set))
-print(testing_set)
+print(len(testing_list))
+print(testing_list)
 
-print_subtree(testing_tree.ultimate_parent.child_one)
+print_subtree(testing_tree.ultimate_parent.children[0])
 
 
 
@@ -291,21 +289,21 @@ testing_tree_2 = TreeContainer()
 const_5 = 5 * np.ones(10)
 const_4 = 4 * np.ones(10)
 const_2 = 2 * np.ones(10)
-testing_tree_2.ultimate_parent.add_left_child(TreeNode(False, None, addition, 2))
-testing_tree_2.ultimate_parent.child_one.add_left_child(TreeNode(True, const_5))
-testing_tree_2.ultimate_parent.child_one.add_right_child(TreeNode(False, None, division, 2))
-testing_tree_2.ultimate_parent.child_one.child_two.add_left_child(TreeNode(True, const_4))
-testing_tree_2.ultimate_parent.child_one.child_two.add_right_child(TreeNode(True, const_2))
+testing_tree_2.ultimate_parent.set_left_child(TreeNode(False, None, addition, 2))
+testing_tree_2.ultimate_parent.children[0].set_left_child(TreeNode(True, const_5))
+testing_tree_2.ultimate_parent.children[0].set_right_child(TreeNode(False, None, division, 2))
+testing_tree_2.ultimate_parent.children[0].children[1].set_left_child(TreeNode(True, const_4))
+testing_tree_2.ultimate_parent.children[0].children[1].set_right_child(TreeNode(True, const_2))
 
 
 
-print_subtree(testing_tree_2.ultimate_parent.child_one)
+print_subtree(testing_tree_2.ultimate_parent.children[0])
 
 
 
 offspring_1, offspring_2 = crossover(testing_tree, testing_tree_2)
 
 print("offspring_1")
-print_subtree(offspring_1.ultimate_parent.child_one)
+print_subtree(offspring_1.ultimate_parent.children[0])
 print("offspring_2")
-print_subtree(offspring_2.ultimate_parent.child_one)
+print_subtree(offspring_2.ultimate_parent.children[0])
