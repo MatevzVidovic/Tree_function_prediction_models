@@ -37,11 +37,21 @@ class TreeContainer:
         return self.ultimate_parent.children[0].calculate_subtree()
 
     
-    # def simple_mutation(self, possible_functions: list, respective_nums_of_args: list, possible_numeric_vectors: list):
-    #     mutation_node = random.choice(self.list_of_nodes)
+    def simple_mutation(self, possible_elem_func_tuples: list, possible_numeric_vectors: list):
+        mutation_node = random.choice(self.list_of_nodes)
 
-    #     if mutation_node.is_leaf:
-    #         numeric_array_length = mutation_node.
+        if mutation_node.is_leaf:
+            mutation_node.numeric_vector = random.choice(possible_numeric_vectors)
+        else:
+            new_elem_func_tuple = random.choice(possible_elem_func_tuples)
+            
+            if (mutation_node.elem_func_tuple[1] == new_elem_func_tuple[1]):
+                mutation_node.elem_func_tuple = new_elem_func_tuple
+            # elif (mutation_node.elem_func_tuple[1] == 1 and new_elem_func_tuple[1]):
+            # elif prvi je 1 in drug 2
+            
+            # elif prvi je 2 in drugi je 1
+        
 
 
     # def mutation
