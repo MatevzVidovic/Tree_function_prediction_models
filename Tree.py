@@ -24,6 +24,9 @@ class TreeContainer:
         self.ultimate_parent = TreeNode(False, None, (pass_through, 1))
         self.list_of_nodes = list()
     
+    def print(self):
+        print_subtree(self.ultimate_parent.children[0])
+
 
     def copy(self):
         new_self = TreeContainer()
@@ -35,8 +38,13 @@ class TreeContainer:
     
     def calculate(self):
         return self.ultimate_parent.children[0].calculate_subtree()
-
     
+    def update_list_of_nodes(self):
+        new_list = list()
+        append_nodes_from_subtree_to_list(self.ultimate_parent.children[0], new_list)
+        self.list_of_nodes = new_list
+    
+
     def simple_mutation(self, possible_elem_func_tuples: list, possible_numeric_vectors: list):
         mutation_node = random.choice(self.list_of_nodes)
 
@@ -47,14 +55,49 @@ class TreeContainer:
             
             if (mutation_node.elem_func_tuple[1] == new_elem_func_tuple[1]):
                 mutation_node.elem_func_tuple = new_elem_func_tuple
-            # elif (mutation_node.elem_func_tuple[1] == 1 and new_elem_func_tuple[1]):
-            # elif prvi je 1 in drug 2
+
+            elif (mutation_node.elem_func_tuple[1] == 1 and new_elem_func_tuple[1] == 2):
+                mutation_node.elem_func_tuple = new_elem_func_tuple
+
+                # we create a new leaf node and assign it to the right child.
+                chosen_numeric_vector = random.choice(possible_numeric_vectors)
+                mutation_node.children[1] = TreeNode(True, chosen_numeric_vector)
+                mutation_node.children[1].parent = mutation_node
+
+                # we update the TreeContainer's list_of_nodes
+                self.update_list_of_nodes()
+
+            elif(mutation_node.elem_func_tuple[1] == 2 and new_elem_func_tuple[1] == 1):
+                mutation_node.elem_func_tuple = new_elem_func_tuple
+                # We decide to drop the right child.
+                mutation_node.children[1] = None
+
+                # we update the TreeContainer's list_of_nodes
+                self.update_list_of_nodes()
             
-            # elif prvi je 2 in drugi je 1
+            else:
+                print("simple_mutation: the mutation couldn't happen.")
+        
+        return
+
+
+    # This picks a node and inserts a new function node between it and it's parent.
+    # If it inserts a function that takes two arguments it's right child will be a new leaf.
+    # def inserting_mutation(self, possible_elem_func_tuples: list, possible_numeric_vectors: list):
+    #     mutation_node = random.choice(self.list_of_nodes)
+    #     parent_node = mutation_node.parent
+    #     new_elem_func_tuple = random.choice(possible_elem_func_tuples)
+    #     new_function_node = TreeNode(False, None, new_elem_func_tuple)
+
+    #     # This function will not be finished right now, since it isn't necessary.
         
 
 
-    # def mutation
+
+
+        
+
+
 
 
 
@@ -65,7 +108,7 @@ class TreeContainer:
 class TreeNode:
 
     # The function you pass has to ba a tuple of the form: (function, num_of_args_of__this_function)
-    def __init__(self, is_leaf: bool, numeric_vector, elem_func_tuple=(None, 0)):
+    def __init__(self, is_leaf=False, numeric_vector=None, elem_func_tuple=(None, 0)):
         self.is_leaf = is_leaf
         self.numeric_vector = numeric_vector
 
@@ -237,9 +280,12 @@ def division(first_array, second_array):
     return_array = first_array / second_array
     return return_array
 
-
 def exponentiation(first_array, second_array):
     return_array = first_array ** second_array
+    return return_array
+
+def cosine(first_array):
+    return_array = np.cos(first_array)
     return return_array
 
 
@@ -249,6 +295,8 @@ def exponentiation(first_array, second_array):
 
 
 # Unit test
+
+# Creating our first testing_tree:
 
 testing_tree = TreeContainer()
 const_5 = 5 * np.ones(10)
@@ -260,34 +308,48 @@ testing_tree.ultimate_parent.children[0].set_right_child(TreeNode(False, None, (
 testing_tree.ultimate_parent.children[0].children[1].set_left_child(TreeNode(True, const_4))
 testing_tree.ultimate_parent.children[0].children[1].set_right_child(TreeNode(True, const_2))
 
-print(testing_tree.calculate())
+print("testing_tree was created and we will test units on it.")
+print("testing_tree:")
+testing_tree.print()
 
-print(testing_tree.ultimate_parent.children[0].calculate_subtree())
-print(testing_tree.ultimate_parent.calculate_subtree())
+print("\n\n\n")
+print("Result of testing_tree.calculate (should be 7): " + str(testing_tree.calculate()))
 
-print(testing_tree.ultimate_parent.children[0].children[1].calculate_subtree())
+# print(testing_tree.ultimate_parent.children[0].calculate_subtree())
+# print(testing_tree.ultimate_parent.calculate_subtree())
+
+# print(testing_tree.ultimate_parent.children[0].children[1].calculate_subtree())
+
 
 testing_list = list()
 append_nodes_from_subtree_to_list(testing_tree.ultimate_parent.children[0].children[1], testing_list)
-# should be 3
-print(len(testing_list))
-print(testing_list)
+
+print("\n\n\n")
+print("len of testing_list from: append_nodes_from_subtree_to_list(testing_tree.ultimate_parent.children[0].children[1], testing_list)")
+print("Len should be 3: " + str(len(testing_list)))
+# print("\n\n\n")
+# print("And the resulting testing_list itself:")
+# print(testing_list)
 
 
 testing_list = list()
 append_nodes_from_subtree_to_list(testing_tree.ultimate_parent.children[0].children[0], testing_list)
-# should be 1
-print(len(testing_list))
-print(testing_list)
+print("\n\n\n")
+print("len of testing_list from: append_nodes_from_subtree_to_list(testing_tree.ultimate_parent.children[0].children[0], testing_list)")
+print("Len should be 1: " + str(len(testing_list)))
+# print("\n\n\n")
+# print("And the resulting testing_list itself:")
+# print(testing_list)
 
 
 testing_list = list()
 append_nodes_from_subtree_to_list(testing_tree.ultimate_parent.children[0], testing_list)
-# should be 5
-print(len(testing_list))
-print(testing_list)
-
-print_subtree(testing_tree.ultimate_parent.children[0])
+print("\n\n\n")
+print("len of testing_list from: append_nodes_from_subtree_to_list(testing_tree.ultimate_parent.children[0], testing_list)")
+print("Len should be 5: " + str(len(testing_list)))
+# print("\n\n\n")
+# print("And the resulting testing_list itself:")
+# print(testing_list)
 
 
 
@@ -304,15 +366,65 @@ testing_tree_2.ultimate_parent.children[0].set_right_child(TreeNode(False, None,
 testing_tree_2.ultimate_parent.children[0].children[1].set_left_child(TreeNode(True, const_4))
 testing_tree_2.ultimate_parent.children[0].children[1].set_right_child(TreeNode(True, const_2))
 
-
-
-print_subtree(testing_tree_2.ultimate_parent.children[0])
+print("\n\n\n")
+print("testing_tree_2:")
+testing_tree_2.print()
 
 
 
 offspring_1, offspring_2 = crossover(testing_tree, testing_tree_2)
 
+print("\n\n\n")
+print("We conducted a crossover between testing_tree_1 and testing_tree_2 (which are identical).")
+print("These are the resulting offsprings:")
+
+
+print("\n\n\n")
 print("offspring_1")
-print_subtree(offspring_1.ultimate_parent.children[0])
-print("offspring_2")
-print_subtree(offspring_2.ultimate_parent.children[0])
+offspring_1.print()
+
+print("\n\n\n")
+print("offspring_2:")
+offspring_2.print()
+
+print("\n\n\n")
+print("Calculation on the offspring_2 tree:")
+print(offspring_2.calculate())
+
+
+
+
+
+print("\n\n\n")
+print("We want to test mutations. We conduct a mutation on the offspring_2 tree.")
+
+testing_mutation_function_tuples = [(addition, 2), (subtraction, 2), (multiplication, 2), (division, 2), (exponentiation, 2), (cosine, 1)]
+base_vector = np.ones(10)
+testting_numeric_vectors = [2 * base_vector, 3*base_vector, 5*base_vector]
+
+offspring_2.simple_mutation(testing_mutation_function_tuples, testting_numeric_vectors)
+
+
+
+print("\n\n\n")
+print("List of possible function tuples: " + str(testing_mutation_function_tuples))
+print()
+print("offspring_2:")
+offspring_2.print()
+
+print(offspring_2.calculate())
+
+
+
+print("\n\n\n")
+print("Continued mutation with cosine being the only possible function:")
+
+testing_mutation_function_tuples = [(cosine, 1)]
+
+offspring_2.simple_mutation(testing_mutation_function_tuples, testting_numeric_vectors)
+
+print("offspring_2:")
+print()
+offspring_2.print()
+
+print(offspring_2.calculate())
