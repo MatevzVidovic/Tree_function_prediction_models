@@ -105,6 +105,7 @@ def create_new_member1():
 
     op_choice = np.append(zeros, ones)
 
+    
     o = random.choice(op_choice)
     operation = pass_through
 
