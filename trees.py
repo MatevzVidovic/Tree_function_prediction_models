@@ -40,11 +40,23 @@ class TreeContainer:
         self.list_of_nodes = new_list
     
 
-    def simple_mutation(self, possible_elem_func_tuples: list, possible_numeric_vectors: list):
+    def simple_mutation(self, possible_elem_func_tuples: list, indep_vector, possible_constant_vectors: list, indep_probability):
+        """
+        indep_probability: how often will the new leaf constant be the indep_vector. Otherwise it will be one of the given constants.
+        """
+
+        # won't necessarily be used, but it's simpler to creare it here
+        leaf_value_vector = None
+        if random.random() < indep_probability:
+            leaf_value_vector = indep_vector.copy()
+        else:
+            leaf_value_vector = random.choice(possible_constant_vectors)
+
+
         mutation_node = random.choice(self.list_of_nodes)
 
         if mutation_node.is_leaf:
-            mutation_node.numeric_vector = random.choice(possible_numeric_vectors)
+            mutation_node.numeric_vector = leaf_value_vector
         else:
             new_elem_func_tuple = random.choice(possible_elem_func_tuples)
             
@@ -55,7 +67,7 @@ class TreeContainer:
                 mutation_node.elem_func_tuple = new_elem_func_tuple
 
                 # we create a new leaf node and assign it to the right child.
-                chosen_numeric_vector = random.choice(possible_numeric_vectors)
+                chosen_numeric_vector = leaf_value_vector
                 mutation_node.children[1] = TreeNode(True, chosen_numeric_vector)
                 mutation_node.children[1].parent = mutation_node
 
@@ -404,9 +416,10 @@ print("We want to test mutations. We conduct a mutation on the offspring_2 tree.
 
 testing_mutation_function_tuples = [(addition, 2), (subtraction, 2), (multiplication, 2), (division, 2), (exponentiation, 2), (cosine, 1)]
 base_vector = np.ones(10)
-testting_numeric_vectors = [2 * base_vector, 3*base_vector, 5*base_vector]
+testing_numeric_vectors = [2 * base_vector, 3*base_vector, 5*base_vector]
+fake_indep_vector = 2 * base_vector
 
-offspring_2.simple_mutation(testing_mutation_function_tuples, testting_numeric_vectors)
+offspring_2.simple_mutation(testing_mutation_function_tuples, fake_indep_vector, testing_numeric_vectors, 0.2)
 
 
 
@@ -425,7 +438,7 @@ print("Continued mutation with cosine being the only possible function:")
 
 testing_mutation_function_tuples = [(cosine, 1)]
 
-offspring_2.simple_mutation(testing_mutation_function_tuples, testting_numeric_vectors)
+offspring_2.simple_mutation(testing_mutation_function_tuples, fake_indep_vector, testing_numeric_vectors, 0.2)
 
 print("offspring_2:")
 print()
