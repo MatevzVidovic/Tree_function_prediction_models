@@ -310,138 +310,138 @@ def cosine(first_array):
 
 
 
-# Unit test
+# # Unit test
 
-# Creating our first testing_tree:
+# # Creating our first testing_tree:
 
-testing_tree = TreeContainer()
-const_5 = 5 * np.ones(10)
-const_4 = 4 * np.ones(10)
-const_2 = 2 * np.ones(10)
-testing_tree.ultimate_parent.set_left_child(TreeNode(False, None, (addition, 2)))
-testing_tree.ultimate_parent.children[0].set_left_child(TreeNode(True, const_5))
-testing_tree.ultimate_parent.children[0].set_right_child(TreeNode(False, None, (division, 2)))
-testing_tree.ultimate_parent.children[0].children[1].set_left_child(TreeNode(True, const_4))
-testing_tree.ultimate_parent.children[0].children[1].set_right_child(TreeNode(True, const_2))
+# testing_tree = TreeContainer()
+# const_5 = 5 * np.ones(10)
+# const_4 = 4 * np.ones(10)
+# const_2 = 2 * np.ones(10)
+# testing_tree.ultimate_parent.set_left_child(TreeNode(False, None, (addition, 2)))
+# testing_tree.ultimate_parent.children[0].set_left_child(TreeNode(True, const_5))
+# testing_tree.ultimate_parent.children[0].set_right_child(TreeNode(False, None, (division, 2)))
+# testing_tree.ultimate_parent.children[0].children[1].set_left_child(TreeNode(True, const_4))
+# testing_tree.ultimate_parent.children[0].children[1].set_right_child(TreeNode(True, const_2))
 
-print("testing_tree was created and we will test units on it.")
-print("testing_tree:")
-testing_tree.print()
+# print("testing_tree was created and we will test units on it.")
+# print("testing_tree:")
+# testing_tree.print()
 
-print("\n\n\n")
-print("Result of testing_tree.calculate (should be 7): " + str(testing_tree.calculate()))
-
-# print(testing_tree.ultimate_parent.children[0].calculate_subtree())
-# print(testing_tree.ultimate_parent.calculate_subtree())
-
-# print(testing_tree.ultimate_parent.children[0].children[1].calculate_subtree())
-
-
-testing_list = list()
-append_nodes_from_subtree_to_list(testing_tree.ultimate_parent.children[0].children[1], testing_list)
-
-print("\n\n\n")
-print("len of testing_list from: append_nodes_from_subtree_to_list(testing_tree.ultimate_parent.children[0].children[1], testing_list)")
-print("Len should be 3: " + str(len(testing_list)))
 # print("\n\n\n")
-# print("And the resulting testing_list itself:")
-# print(testing_list)
+# print("Result of testing_tree.calculate (should be 7): " + str(testing_tree.calculate()))
+
+# # print(testing_tree.ultimate_parent.children[0].calculate_subtree())
+# # print(testing_tree.ultimate_parent.calculate_subtree())
+
+# # print(testing_tree.ultimate_parent.children[0].children[1].calculate_subtree())
 
 
-testing_list = list()
-append_nodes_from_subtree_to_list(testing_tree.ultimate_parent.children[0].children[0], testing_list)
-print("\n\n\n")
-print("len of testing_list from: append_nodes_from_subtree_to_list(testing_tree.ultimate_parent.children[0].children[0], testing_list)")
-print("Len should be 1: " + str(len(testing_list)))
+# testing_list = list()
+# append_nodes_from_subtree_to_list(testing_tree.ultimate_parent.children[0].children[1], testing_list)
+
 # print("\n\n\n")
-# print("And the resulting testing_list itself:")
-# print(testing_list)
+# print("len of testing_list from: append_nodes_from_subtree_to_list(testing_tree.ultimate_parent.children[0].children[1], testing_list)")
+# print("Len should be 3: " + str(len(testing_list)))
+# # print("\n\n\n")
+# # print("And the resulting testing_list itself:")
+# # print(testing_list)
 
 
-testing_list = list()
-append_nodes_from_subtree_to_list(testing_tree.ultimate_parent.children[0], testing_list)
-print("\n\n\n")
-print("len of testing_list from: append_nodes_from_subtree_to_list(testing_tree.ultimate_parent.children[0], testing_list)")
-print("Len should be 5: " + str(len(testing_list)))
+# testing_list = list()
+# append_nodes_from_subtree_to_list(testing_tree.ultimate_parent.children[0].children[0], testing_list)
 # print("\n\n\n")
-# print("And the resulting testing_list itself:")
-# print(testing_list)
+# print("len of testing_list from: append_nodes_from_subtree_to_list(testing_tree.ultimate_parent.children[0].children[0], testing_list)")
+# print("Len should be 1: " + str(len(testing_list)))
+# # print("\n\n\n")
+# # print("And the resulting testing_list itself:")
+# # print(testing_list)
+
+
+# testing_list = list()
+# append_nodes_from_subtree_to_list(testing_tree.ultimate_parent.children[0], testing_list)
+# print("\n\n\n")
+# print("len of testing_list from: append_nodes_from_subtree_to_list(testing_tree.ultimate_parent.children[0], testing_list)")
+# print("Len should be 5: " + str(len(testing_list)))
+# # print("\n\n\n")
+# # print("And the resulting testing_list itself:")
+# # print(testing_list)
 
 
 
 
 
 
-testing_tree_2 = TreeContainer()
-const_5 = 5 * np.ones(10)
-const_4 = 4 * np.ones(10)
-const_2 = 2 * np.ones(10)
-testing_tree_2.ultimate_parent.set_left_child(TreeNode(False, None, (addition, 2)))
-testing_tree_2.ultimate_parent.children[0].set_left_child(TreeNode(True, const_5))
-testing_tree_2.ultimate_parent.children[0].set_right_child(TreeNode(False, None, (division, 2)))
-testing_tree_2.ultimate_parent.children[0].children[1].set_left_child(TreeNode(True, const_4))
-testing_tree_2.ultimate_parent.children[0].children[1].set_right_child(TreeNode(True, const_2))
+# testing_tree_2 = TreeContainer()
+# const_5 = 5 * np.ones(10)
+# const_4 = 4 * np.ones(10)
+# const_2 = 2 * np.ones(10)
+# testing_tree_2.ultimate_parent.set_left_child(TreeNode(False, None, (addition, 2)))
+# testing_tree_2.ultimate_parent.children[0].set_left_child(TreeNode(True, const_5))
+# testing_tree_2.ultimate_parent.children[0].set_right_child(TreeNode(False, None, (division, 2)))
+# testing_tree_2.ultimate_parent.children[0].children[1].set_left_child(TreeNode(True, const_4))
+# testing_tree_2.ultimate_parent.children[0].children[1].set_right_child(TreeNode(True, const_2))
 
-print("\n\n\n")
-print("testing_tree_2:")
-testing_tree_2.print()
-
-
-
-offspring_1, offspring_2 = crossover(testing_tree, testing_tree_2)
-
-print("\n\n\n")
-print("We conducted a crossover between testing_tree_1 and testing_tree_2 (which are identical).")
-print("These are the resulting offsprings:")
-
-
-print("\n\n\n")
-print("offspring_1")
-offspring_1.print()
-
-print("\n\n\n")
-print("offspring_2:")
-offspring_2.print()
-
-print("\n\n\n")
-print("Calculation on the offspring_2 tree:")
-print(offspring_2.calculate())
+# print("\n\n\n")
+# print("testing_tree_2:")
+# testing_tree_2.print()
 
 
 
+# offspring_1, offspring_2 = crossover(testing_tree, testing_tree_2)
+
+# print("\n\n\n")
+# print("We conducted a crossover between testing_tree_1 and testing_tree_2 (which are identical).")
+# print("These are the resulting offsprings:")
 
 
-print("\n\n\n")
-print("We want to test mutations. We conduct a mutation on the offspring_2 tree.")
+# print("\n\n\n")
+# print("offspring_1")
+# offspring_1.print()
 
-testing_mutation_function_tuples = [(addition, 2), (subtraction, 2), (multiplication, 2), (division, 2), (exponentiation, 2), (cosine, 1)]
-base_vector = np.ones(10)
-testing_numeric_vectors = [2 * base_vector, 3*base_vector, 5*base_vector]
-fake_indep_vector = 2 * base_vector
+# print("\n\n\n")
+# print("offspring_2:")
+# offspring_2.print()
 
-offspring_2.simple_mutation(testing_mutation_function_tuples, fake_indep_vector, testing_numeric_vectors, 0.2)
-
-
-
-print("\n\n\n")
-print("List of possible function tuples: " + str(testing_mutation_function_tuples))
-print()
-print("offspring_2:")
-offspring_2.print()
-
-print(offspring_2.calculate())
+# print("\n\n\n")
+# print("Calculation on the offspring_2 tree:")
+# print(offspring_2.calculate())
 
 
 
-print("\n\n\n")
-print("Continued mutation with cosine being the only possible function:")
 
-testing_mutation_function_tuples = [(cosine, 1)]
 
-offspring_2.simple_mutation(testing_mutation_function_tuples, fake_indep_vector, testing_numeric_vectors, 0.2)
+# print("\n\n\n")
+# print("We want to test mutations. We conduct a mutation on the offspring_2 tree.")
 
-print("offspring_2:")
-print()
-offspring_2.print()
+# testing_mutation_function_tuples = [(addition, 2), (subtraction, 2), (multiplication, 2), (division, 2), (exponentiation, 2), (cosine, 1)]
+# base_vector = np.ones(10)
+# testing_numeric_vectors = [2 * base_vector, 3*base_vector, 5*base_vector]
+# fake_indep_vector = 2 * base_vector
 
-print(offspring_2.calculate())
+# offspring_2.simple_mutation(testing_mutation_function_tuples, fake_indep_vector, testing_numeric_vectors, 0.2)
+
+
+
+# print("\n\n\n")
+# print("List of possible function tuples: " + str(testing_mutation_function_tuples))
+# print()
+# print("offspring_2:")
+# offspring_2.print()
+
+# print(offspring_2.calculate())
+
+
+
+# print("\n\n\n")
+# print("Continued mutation with cosine being the only possible function:")
+
+# testing_mutation_function_tuples = [(cosine, 1)]
+
+# offspring_2.simple_mutation(testing_mutation_function_tuples, fake_indep_vector, testing_numeric_vectors, 0.2)
+
+# print("offspring_2:")
+# print()
+# offspring_2.print()
+
+# print(offspring_2.calculate())
