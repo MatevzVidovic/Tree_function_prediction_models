@@ -20,7 +20,8 @@ class TreeContainer:
         self.list_of_nodes = list()
     
     def print(self):
-        print_subtree(self.ultimate_parent.children[0])
+        # print_subtree(self.ultimate_parent.children[0])
+        print(string_of_subtree(self.ultimate_parent.children[0]))
 
 
     def copy(self):
@@ -150,6 +151,9 @@ class TreeNode:
         adding_node.parent = self
         return
 
+    def has_right_child(self):
+        return (self.children[1] != None)
+
 
         
 
@@ -214,6 +218,8 @@ def print_subtree(subtree_root: TreeNode, level_tuple=()):
     print_subtree(subtree_root.children[1], level_tuple_right)
 
     return
+
+
 
 
 
@@ -303,6 +309,51 @@ def exponentiation(first_array, second_array):
 def cosine(first_array):
     return_array = np.cos(first_array)
     return return_array
+
+
+
+
+function_name_to_sign_map = {
+    pass_through.__name__ : "p",
+    addition.__name__ : "+",
+    subtraction.__name__ : "-",
+    multiplication.__name__ : "*",
+    division.__name__ : "/",
+    exponentiation.__name__ : "**",
+    cosine.__name__ : "cos",
+    
+}
+
+# Recurssively builds the string that represents the tree.
+def string_of_subtree(subtree_root: TreeNode):
+
+    if subtree_root == None:
+        return ""
+
+    if subtree_root.is_leaf:
+        current_string = ""
+
+        # Case when it is a variable:
+        if subtree_root.numeric_vector[0] != subtree_root.numeric_vector[1]:
+            current_string = "x"
+        # And when it is a constant:
+        else:
+            current_string = str(subtree_root.numeric_vector[0])
+
+        return current_string
+    
+
+    func_name = subtree_root.elem_func_tuple[0].__name__
+    sign_of_function = function_name_to_sign_map[func_name]
+
+    if subtree_root.has_right_child():
+        
+        current_string = "(" + string_of_subtree(subtree_root.children[0]) + sign_of_function + string_of_subtree(subtree_root.children[1]) + ")"
+        return current_string
+    
+    else:
+        current_string = sign_of_function + "(" + string_of_subtree(subtree_root.children[0]) + ")"
+        return current_string
 
 
 

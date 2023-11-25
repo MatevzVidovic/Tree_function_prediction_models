@@ -413,5 +413,14 @@ diary:
     novega člena bolj naključno.
 
     XY_index je sedaj globalna spremenljivka. Nikjer se je ne podaja.
-    Sva že v parameter hell-u, pa da se to malce izboljša.
+    Preprosto olajša zadeve. Ker saj itak X in Y tudi globalno podajava.
+    Pac ne delava huge projekta. Naj bodo dobre prakse za kdaj drugic.
+
+    Vsi parametri se zdaj nastavljajo v objekt parameters, ki je tipa Parameters.
+    Tako nimava takega function parameter hell-a, kot sva ga imela prej.
+    Ta objekt si potem funkcije stalno podajajo, in vsaka uporabi tiste atribute, ki jih potrebuje.
+    Saj bi lahko tudi to imela globalno, kot imava XY-index, ampak ade, vsaj malo dobre prakse.
+    Pa tudi lazje je programirat, ce ves, na kaj se navezujes.
+
+    Fitness function je dozivela spremembe. Se mi zdi, da kar okej deluje trenutno.
 """
