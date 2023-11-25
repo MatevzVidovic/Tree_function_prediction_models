@@ -6,6 +6,19 @@ import random
 
 
 
+class Parameters:
+
+    def __init__(self):
+        # These are only the default values. They should be changed before use.
+        self.num_iterations = 500
+        self.pop_size = 15
+        self.elitism = 0.1
+        self.new_chromosomes_proportion = 0.1
+        self.mutation_prob = 0.1
+        self.tournament_num_of_participants = 4
+        self.indep_prob = 0.2    # prob of choosing the indep vector when creating a new leaf (instead of a constant)
+        self.fitness_func_exponent = 1/3   # The exponent that is used on the num_of_operations
+
 
 
 ds = pd.read_csv('dataset.csv')
@@ -90,7 +103,7 @@ additional_elem_func_tuples = [(cosine, 1)]
 
 #fitness function
 #lahko probava še kakšne druge načine računanja napak
-def fitness(tree):
+def fitness(tree, params: Parameters):
     st_operacij = len(tree.list_of_nodes)
 
     dep_vector = Y[XY_index]
@@ -101,10 +114,19 @@ def fitness(tree):
         L1_errors = np.abs(dep_vector - calc)
         average_L1_error = np.sum(L1_errors / len(L1_errors))
 
-        # This seems to not work. The values mostly just stay the same for some reason.:
-        # multiplied_with_num_of_ops_function = average_L1_error * (st_operacij ** 3)
+        # These two solutions are equally good according to this function:
+        # Solution 1:   average_L1_error == 2x, st_operacij == n
+        # Solution 2:   average_L1_error == x,  st_operacij == (2**(1/exponent))*n == (2**(1/(1/3)))*n == (2**3)*n in the current case
+        multiplied_with_num_of_ops_function = average_L1_error * (st_operacij ** (params.fitness_func_exponent))
+
+        if multiplied_with_num_of_ops_function <= 0:
+            # This way, when we do hit the correct equation, it doesn't get ruined by next iterations with longer equations.
+            # For example, case 0:    we found the correct equation soon. Then the evaluation vector was all zeros. In the end, the winning function was: (x**4)+3+3
+            # We chose 100 - st_operacij, because if st_operacij is larger than 100 it might as well go into the negatives, since it is so bad.
+            # The minus is added because of the negation of the value when returning. The brackets aren't simplifed to retain comprehensibility.
+            multiplied_with_num_of_ops_function = -(100 - st_operacij)
         
-        return -(average_L1_error)
+        return -(multiplied_with_num_of_ops_function)
     else:
         return float('-inf')
 
@@ -126,23 +148,18 @@ def give_small_constant(length):
 
 
 #naredi random člana populacije
-def create_new_member(indep_probability=0.2):
+def create_new_member(params: Parameters):
     
     c = random.randint(0,1)
     if (c == 0):
-        return create_new_member_3(indep_probability)
+        return create_new_member_3(params)
     else:
-        return create_new_member_5(indep_probability)
+        return create_new_member_5(params)
 
 
 #drevo velikosti 3
-def create_new_member_3(indep_probability=0.2):
-    """
-    example use: create_new_member1(X[iteracija], 0.3)
-
-    indep_probability: how likely a leaf node is to have the indep variable, as opposed to a constant
-    """
-    
+def create_new_member_3(params: Parameters):
+        
     indep_vector = X[XY_index]
 
     new_tree = TreeContainer()
@@ -161,13 +178,13 @@ def create_new_member_3(indep_probability=0.2):
 
 
     const1 = None
-    if (random.random() < indep_probability):
+    if (random.random() < params.indep_prob):
         const1 = np.copy(indep_vector)
     else: 
         const1 = give_small_constant(indep_vector.size)
     
     const2 = None
-    if (random.random() < indep_probability):
+    if (random.random() < params.indep_prob):
         const2 = np.copy(indep_vector)
     else: 
         const2 = give_small_constant(indep_vector.size)
@@ -189,7 +206,7 @@ def create_new_member_3(indep_probability=0.2):
 
 
 #drevo velikosti 5
-def create_new_member_5(indep_probability=0.2):
+def create_new_member_5(params: Parameters):
     
     indep_vector = X[XY_index]
 
@@ -198,19 +215,19 @@ def create_new_member_5(indep_probability=0.2):
     op2 = give_simple_operation()
 
     const1 = None
-    if (random.random() < indep_probability):
+    if (random.random() < params.indep_prob):
         const1 = np.copy(indep_vector)
     else: 
         const1 = give_small_constant(indep_vector.size)
     
     const2 = None
-    if (random.random() < indep_probability):
+    if (random.random() < params.indep_prob):
         const2 = np.copy(indep_vector)
     else: 
         const2 = give_small_constant(indep_vector.size)
 
     const3 = None
-    if (random.random() < indep_probability):
+    if (random.random() < params.indep_prob):
         const3 = np.copy(indep_vector)
     else: 
         const3 = give_small_constant(indep_vector.size)
@@ -241,33 +258,34 @@ def create_new_member_5(indep_probability=0.2):
 
 
 # naredi začetno populacijo
-def create_starting_population(n, indep_prob):
+def create_starting_population(params: Parameters):
     population = []
 
-    for i in range(0, n):
-        population.append(create_new_member(indep_prob))
+    print(params.pop_size)
+    for i in range(0, params.pop_size):
+        population.append(create_new_member(params))
     return population
 
 # izračuna fitness vsem v populaciji, uporabljal za testing
-def evaluate_population(population):
+def evaluate_population(population, params):
     values = []
 
     for i in range(0, len(population)):
-        values.append(fitness(population[i]))
+        values.append(fitness(population[i], params))
 
     return values
 
 
-def tournement_get_2_children(population, num_of_participants_in_tournament):
-    tournament_participants = random.sample(population, num_of_participants_in_tournament)
-    tournament_participants.sort(reverse=True, key=fitness)
+def tournement_get_2_children(population, params: Parameters):
+    tournament_participants = random.sample(population, params.tournament_num_of_participants)
+    tournament_participants.sort(reverse=True, key=lambda tree: fitness(tree, params))
 
     child1, child2 = crossover(tournament_participants[0], tournament_participants[1])
     return (child1, child2)
 
 
 
-def create_next_population(population, elitism, new_chromosomes_proportion, mutation_prob, tournament_num_of_participants, indep_prob_when_creating_new=0.2):
+def create_next_population(population, params: Parameters):
     """
     elitism: what percentage of the best gets kept
     new_chromosomes_proportion: percentage of the next pop that will be made up by new random individuals
@@ -276,19 +294,19 @@ def create_next_population(population, elitism, new_chromosomes_proportion, muta
 
     # print(evaluation)
     size = len(population)
-    population.sort(reverse=True, key=fitness)
+    population.sort(reverse=True, key=lambda tree: fitness(tree, params))
 
-    evaluation = evaluate_population(population)
+    evaluation = evaluate_population(population, params)
     print(evaluation)
     print("____________________________")
 
 
     # ohranimo najboljse (elitism)
-    next_population = population[0:int(len(population) * elitism)].copy()
+    next_population = population[0:int(len(population) * params.elitism)].copy()
 
 
-    for i in range(int(len(population) * new_chromosomes_proportion)):
-        next_population.append(create_new_member(indep_prob_when_creating_new))
+    for i in range(int(len(population) * params.new_chromosomes_proportion)):
+        next_population.append(create_new_member(params))
 
 
 
@@ -300,12 +318,12 @@ def create_next_population(population, elitism, new_chromosomes_proportion, muta
 
     for i in range(int(num_of_children_to_be_created / 2 + 1)):
 
-        child1, child2 = tournement_get_2_children(population, tournament_num_of_participants)
+        child1, child2 = tournement_get_2_children(population, params)
 
-        if (random.random() < mutation_prob):
+        if (random.random() < params.mutation_prob):
             child1.simple_mutation(simple_elem_func_tuples, X[iteracija], [give_small_constant(X[iteracija].size)], 0.3)
 
-        if (random.random() < mutation_prob):
+        if (random.random() < params.mutation_prob):
             child2.simple_mutation(simple_elem_func_tuples, X[iteracija], [give_small_constant(X[iteracija].size)], 0.3)
 
         children.append(child1)
@@ -320,12 +338,12 @@ def create_next_population(population, elitism, new_chromosomes_proportion, muta
 
 
 
-def Genetic_Algorithm(num_iterations, pop_size,       elitism, new_chromosomes_proportion, mutation_prob, tournament_num_of_participants, indep_prob_when_creating_new=0.2):
+def Genetic_Algorithm(params: Parameters):
     
-    population = create_starting_population(pop_size, indep_prob_when_creating_new)
+    population = create_starting_population(params)
 
-    for i in range(0, num_iterations):
-        population = create_next_population(population, elitism, new_chromosomes_proportion, mutation_prob, tournament_num_of_participants, indep_prob_when_creating_new=0.2)
+    for i in range(0, params.num_iterations):
+        population = create_next_population(population, params)
         #for a in population:
             #print(a.calculate())
 
@@ -343,18 +361,36 @@ def Genetic_Algorithm(num_iterations, pop_size,       elitism, new_chromosomes_p
 
 
 
+
+
+
+
+
+
+
+
+parameters = Parameters()
+parameters.num_iterations=500
+parameters.pop_size=15
+parameters.elitism=0.1
+parameters.new_chromosomes_proportion=0.1
+parameters.mutation_prob=0.1
+parameters.tournament_num_of_participants=4
+parameters.indep_prob=0.2 # prob of choosing the indep vector when creating a new leaf (instead of a constant)
+parameters.fitness_func_exponent= 1/3    # The exponent that is used on the num_of_operations
+
+
+
 print("--------------------------------------------------------")
 #test = create_new_member()
 #print(test.calculate())
-num_iterations = 500
-pop_size = 15
-mutation_probability = 0.8
+
 
 # !!!!! To je sedaj nujna globalna spremenljivka, ki se povsod uporablja.
-# Razlog: imava že parameter hell. Da se vsaj malo olajsa. Itak ni velik projekt, in je ok malo slabe prakse.
+# Razlog: itak ne bova izvajala nekega multithreadanja. Vseeno če prej nastaviva, pa ni treba potem podajat.
 XY_index = 0
 
-Genetic_Algorithm(num_iterations, pop_size, elitism=0.1, new_chromosomes_proportion=0.1, mutation_prob=0.1, tournament_num_of_participants=4, indep_prob_when_creating_new=0.2)
+Genetic_Algorithm(parameters)
 
 
 
@@ -375,4 +411,7 @@ diary:
 
     dodal funkcije create_new_member da lahko generira drevesa velikosti 5, zdaj je generiranje
     novega člena bolj naključno.
+
+    XY_index je sedaj globalna spremenljivka. Nikjer se je ne podaja.
+    Sva že v parameter hell-u, pa da se to malce izboljša.
 """
