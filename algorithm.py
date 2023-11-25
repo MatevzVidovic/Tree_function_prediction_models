@@ -297,8 +297,8 @@ def create_next_population(population, params: Parameters):
     population.sort(reverse=True, key=lambda tree: fitness(tree, params))
 
     evaluation = evaluate_population(population, params)
-    print(evaluation)
-    print("____________________________")
+    # print(evaluation[0:5])
+    # print("____________________________")
 
 
     # ohranimo najboljse (elitism)
@@ -348,14 +348,18 @@ def Genetic_Algorithm(params: Parameters):
             #print(a.calculate())
 
     #testing
+    print("Our formula:")
     population[0].print()
-    print()
+    print("Given formula:")
+    print(eq[XY_index])
+    print("Fitness function:")
+    print(fitness(population[0], params))
     print("Calculation:")
     print(population[0].calculate())
     print("Actual Y values:")
     print(Y[XY_index])
-    print(len(population[0].list_of_nodes))
-    return True
+
+    return population[0]
 
 
 
@@ -370,8 +374,8 @@ def Genetic_Algorithm(params: Parameters):
 
 
 parameters = Parameters()
-parameters.num_iterations=500
-parameters.pop_size=15
+parameters.num_iterations=1000
+parameters.pop_size=30
 parameters.elitism=0.1
 parameters.new_chromosomes_proportion=0.1
 parameters.mutation_prob=0.1
@@ -390,7 +394,11 @@ print("--------------------------------------------------------")
 # Razlog: itak ne bova izvajala nekega multithreadanja. Vseeno če prej nastaviva, pa ni treba potem podajat.
 XY_index = 0
 
-Genetic_Algorithm(parameters)
+for i in range(50):
+    XY_index = i
+    Genetic_Algorithm(parameters)
+
+
 
 
 
