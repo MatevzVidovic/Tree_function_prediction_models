@@ -23,6 +23,9 @@ class TreeContainer:
         # print_subtree(self.ultimate_parent.children[0])
         print(string_of_subtree(self.ultimate_parent.children[0]))
 
+    def to_string(self):
+        # print_subtree(self.ultimate_parent.children[0])
+        return string_of_subtree(self.ultimate_parent.children[0])
 
     def copy(self):
         new_self = TreeContainer()
@@ -91,14 +94,32 @@ class TreeContainer:
 
     # This picks a node and inserts a new function node between it and it's parent.
     # If it inserts a function that takes two arguments it's right child will be a new leaf.
-    # def inserting_mutation(self, possible_elem_func_tuples: list, possible_numeric_vectors: list):
-    #     mutation_node = random.choice(self.list_of_nodes)
-    #     parent_node = mutation_node.parent
-    #     new_elem_func_tuple = random.choice(possible_elem_func_tuples)
-    #     new_function_node = TreeNode(False, None, new_elem_func_tuple)
-
-    #     # This function will not be finished right now, since it isn't necessary.
+    def inserting_mutation(self, possible_elem_func_tuples: list, possible_constant_vectors: list):
         
+        mutation_node = random.choice(self.list_of_nodes)
+        
+        parent_node = mutation_node.parent
+        
+        new_elem_func_tuple = random.choice(possible_elem_func_tuples)
+        new_function_node = TreeNode(False, None, new_elem_func_tuple)
+
+        if parent_node.children[0] == mutation_node:
+            parent_node.set_left_child(new_function_node)
+        elif parent_node.children[1] == mutation_node:
+            parent_node.set_right_child(new_function_node)
+        else:
+            print("inserting_mutation() error")
+
+        new_function_node.set_left_child(mutation_node)
+        
+        if (new_elem_func_tuple[1] == 2):
+            leaf_value_vector = random.choice(possible_constant_vectors)
+            new_function_node.set_right_child(TreeNode(True, leaf_value_vector))
+        
+        
+        self.update_list_of_nodes()
+
+        return
 
 
 
@@ -485,11 +506,26 @@ def string_of_subtree(subtree_root: TreeNode):
 
 
 # print("\n\n\n")
-# print("Continued mutation with cosine being the only possible function:")
+# print("Continued simple mutation with cosine being the only possible function:")
 
 # testing_mutation_function_tuples = [(cosine, 1)]
 
 # offspring_2.simple_mutation(testing_mutation_function_tuples, fake_indep_vector, testing_numeric_vectors, 0.2)
+
+# print("offspring_2:")
+# print()
+# offspring_2.print()
+
+# print(offspring_2.calculate())
+
+
+
+# print("\n\n\n")
+# print("Continued inserting mutation with cosine and addition being the only possible functions:")
+
+# testing_mutation_function_tuples = [(cosine, 1), (addition, 2)]
+
+# offspring_2.inserting_mutation(testing_mutation_function_tuples, testing_numeric_vectors)
 
 # print("offspring_2:")
 # print()

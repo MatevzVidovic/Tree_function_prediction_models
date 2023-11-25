@@ -1,0 +1,289 @@
+--------------------------------------------------------
+30
+Our formula:
+((x**4.0)-6.0)
+Given formula:
+((x ** 4) - 6)
+Num of necessary iterations:
+115
+Fitness function:
+95
+Calculation:
+[-5.000e+00  1.000e+01  7.500e+01  2.500e+02  6.190e+02  1.290e+03
+  2.395e+03  4.090e+03  6.555e+03  9.994e+03]
+Actual Y values:
+[-5.000e+00  1.000e+01  7.500e+01  2.500e+02  6.190e+02  1.290e+03
+  2.395e+03  4.090e+03  6.555e+03  9.994e+03]
+30
+Our formula:
+((x/4.0)+1.0)
+Given formula:
+(((x / 8) * 2) + 1)
+Num of necessary iterations:
+261
+Fitness function:
+95
+Calculation:
+[1.25 1.5  1.75 2.   2.25 2.5  2.75 3.   3.25 3.5 ]
+Actual Y values:
+[1.25 1.5  1.75 2.   2.25 2.5  2.75 3.   3.25 3.5 ]
+30
+Our formula:
+((x-(8.0-x))/10.0)
+Given formula:
+(((x - 1) - 3) / 5)
+Num of necessary iterations:
+828
+Fitness function:
+93
+Calculation:
+[-0.6 -0.4 -0.2  0.   0.2  0.4  0.6  0.8  1.   1.2]
+Actual Y values:
+[-0.6 -0.4 -0.2  0.   0.2  0.4  0.6  0.8  1.   1.2]
+30
+Our formula:
+(x*5.0)
+Given formula:
+(x * 5)
+Num of necessary iterations:
+21
+Fitness function:
+97
+Calculation:
+[ 5. 10. 15. 20. 25. 30. 35. 40. 45. 50.]
+Actual Y values:
+[ 5. 10. 15. 20. 25. 30. 35. 40. 45. 50.]
+30
+Our formula:
+(2.0+x)
+Given formula:
+(x + 2)
+Num of necessary iterations:
+20
+Fitness function:
+97
+Calculation:
+[ 3.  4.  5.  6.  7.  8.  9. 10. 11. 12.]
+Actual Y values:
+[ 3.  4.  5.  6.  7.  8.  9. 10. 11. 12.]
+30
+Our formula:
+((x*7.0)+7.0)
+Given formula:
+((x + 1) * 7)
+Num of necessary iterations:
+283
+Fitness function:
+95
+Calculation:
+[14. 21. 28. 35. 42. 49. 56. 63. 70. 77.]
+Actual Y values:
+[14. 21. 28. 35. 42. 49. 56. 63. 70. 77.]
+30
+Our formula:
+((x**9.0)*5.0)
+Given formula:
+((x + 2) ** 9)
+Num of necessary iterations:
+1000
+Fitness function:
+-208703862.1636344
+Calculation:
+[5.00000000e+00 2.56000000e+03 9.84150000e+04 1.31072000e+06
+ 9.76562500e+06 5.03884800e+07 2.01768035e+08 6.71088640e+08
+ 1.93710244e+09 5.00000000e+09]
+Actual Y values:
+[1.96830000e+04 2.62144000e+05 1.95312500e+06 1.00776960e+07
+ 4.03536070e+07 1.34217728e+08 3.87420489e+08 1.00000000e+09
+ 2.35794769e+09 5.15978035e+09]
+30
+Our formula:
+(x+x)
+Given formula:
+(x * 2)
+Num of necessary iterations:
+21
+Fitness function:
+97
+Calculation:
+[ 2.  4.  6.  8. 10. 12. 14. 16. 18. 20.]
+Actual Y values:
+[ 2.  4.  6.  8. 10. 12. 14. 16. 18. 20.]
+30
+Our formula:
+(((x**8.0)+(((8.0+(((x+((x**8.0)/2.0))+(x+(x+(((x**8.0)+(((((x**8.0)/2.0)+((x**8.0)+(((8.0+(2.0/2.0))+(((x**8.0)+(((8.0+8.0)+(x**8.0))/8.0))+((x**8.0)/2.0)))/8.0)))+(x**8.0))/8.0))/8.0))))/2.0))+(x**8.0))/8.0))+((x**8.0)/2.0))
+Given formula:
+(((x ** 8) * 5) / 3)
+Num of necessary iterations:
+1000
+Fitness function:
+-2592.676812820232
+Calculation:
+[2.85554504e+00 4.28052124e+02 1.09367974e+04 1.09230751e+05
+ 6.51057513e+05 2.79942193e+06 9.60820923e+06 2.79626265e+07
+ 7.17460703e+07 1.66670230e+08]
+Actual Y values:
+[1.66666667e+00 4.26666667e+02 1.09350000e+04 1.09226667e+05
+ 6.51041667e+05 2.79936000e+06 9.60800167e+06 2.79620267e+07
+ 7.17445350e+07 1.66666667e+08]
+30
+Our formula:
+(x/7.0)
+Given formula:
+(x / 7)
+Num of necessary iterations:
+28
+Fitness function:
+97
+Calculation:
+[0.14285714 0.28571429 0.42857143 0.57142857 0.71428571 0.85714286
+ 1.         1.14285714 1.28571429 1.42857143]
+Actual Y values:
+[0.14285714 0.28571429 0.42857143 0.57142857 0.71428571 0.85714286
+ 1.         1.14285714 1.28571429 1.42857143]
+30
+Our formula:
+((5.0*x)+10.0)
+Given formula:
+(((x - 2) + 4) * 5)
+Num of necessary iterations:
+95
+Fitness function:
+95
+Calculation:
+[15. 20. 25. 30. 35. 40. 45. 50. 55. 60.]
+Actual Y values:
+[15. 20. 25. 30. 35. 40. 45. 50. 55. 60.]
+30
+Our formula:
+((x/(1.0*9.0))/7.0)
+Given formula:
+((x / 9) / 7)
+Num of necessary iterations:
+64
+Fitness function:
+93
+Calculation:
+[0.01587302 0.03174603 0.04761905 0.06349206 0.07936508 0.0952381
+ 0.11111111 0.12698413 0.14285714 0.15873016]
+Actual Y values:
+[0.01587302 0.03174603 0.04761905 0.06349206 0.07936508 0.0952381
+ 0.11111111 0.12698413 0.14285714 0.15873016]
+30
+Our formula:
+((x*x)**2.0)
+Given formula:
+(x ** 4)
+Num of necessary iterations:
+55
+Fitness function:
+95
+Calculation:
+[1.000e+00 1.600e+01 8.100e+01 2.560e+02 6.250e+02 1.296e+03 2.401e+03
+ 4.096e+03 6.561e+03 1.000e+04]
+Actual Y values:
+[1.000e+00 1.600e+01 8.100e+01 2.560e+02 6.250e+02 1.296e+03 2.401e+03
+ 4.096e+03 6.561e+03 1.000e+04]
+30
+Our formula:
+((((x*7.0)-3.0)+(7.0-3.0))-3.0)
+Given formula:
+((x * 7) - 2)
+Num of necessary iterations:
+667
+Fitness function:
+89
+Calculation:
+[ 5. 12. 19. 26. 33. 40. 47. 54. 61. 68.]
+Actual Y values:
+[ 5. 12. 19. 26. 33. 40. 47. 54. 61. 68.]
+30
+Our formula:
+(x*((x**7.0)/6.0))
+Given formula:
+(((x - 2) * 2) ** 6)
+Num of necessary iterations:
+1000
+Fitness function:
+-141330.38459092996
+Calculation:
+[1.66666667e-01 4.26666667e+01 1.09350000e+03 1.09226667e+04
+ 6.51041667e+04 2.79936000e+05 9.60800167e+05 2.79620267e+06
+ 7.17445350e+06 1.66666667e+07]
+Actual Y values:
+[6.4000000e+01 0.0000000e+00 6.4000000e+01 4.0960000e+03 4.6656000e+04
+ 2.6214400e+05 1.0000000e+06 2.9859840e+06 7.5295360e+06 1.6777216e+07]
+30
+Our formula:
+10.0
+Given formula:
+(((x ** 4) - 8) ** 7)
+Num of necessary iterations:
+1000
+Fitness function:
+-1.0482566424167723e+27
+Calculation:
+[10. 10. 10. 10. 10. 10. 10. 10. 10. 10.]
+Actual Y values:
+[-8.23543000e+05  2.09715200e+06  1.10473985e+13  5.76981337e+16
+  3.40405171e+19  5.88045649e+21  4.49364635e+23  1.90799051e+25
+  5.18897019e+26  9.94413422e+27]
+30
+Our formula:
+(x+4.0)
+Given formula:
+(x + 4)
+Num of necessary iterations:
+41
+Fitness function:
+97
+Calculation:
+[ 5.  6.  7.  8.  9. 10. 11. 12. 13. 14.]
+Actual Y values:
+[ 5.  6.  7.  8.  9. 10. 11. 12. 13. 14.]
+30
+Our formula:
+((10.0*3.0)**x)
+Given formula:
+(((x ** 2) ** 7) * 5)
+Num of necessary iterations:
+1000
+Fitness function:
+-35963750814639.22
+Calculation:
+[3.0000e+01 9.0000e+02 2.7000e+04 8.1000e+05 2.4300e+07 7.2900e+08
+ 2.1870e+10 6.5610e+11 1.9683e+13 5.9049e+14]
+Actual Y values:
+[5.00000000e+00 8.19200000e+04 2.39148450e+07 1.34217728e+09
+ 3.05175781e+10 3.91820820e+11 3.39111536e+12 2.19902326e+13
+ 1.14383962e+14 5.00000000e+14]
+30
+Our formula:
+10.0
+Given formula:
+(((x * 4) * 4) ** 6)
+Num of necessary iterations:
+1000
+Fitness function:
+-3319212802038.0
+Calculation:
+[10. 10. 10. 10. 10. 10. 10. 10. 10. 10.]
+Actual Y values:
+[1.67772160e+07 1.07374182e+09 1.22305905e+10 6.87194767e+10
+ 2.62144000e+11 7.82757790e+11 1.97382269e+12 4.39804651e+12
+ 8.91610045e+12 1.67772160e+13]
+30
+Our formula:
+((x-((x-((7.0/(5.0-(((5.0-(((5.0-(((5.0-(((5.0-(((5.0-(((5.0-(((5.0-(((5.0-((7.0/7.0)/7.0))/7.0)/7.0))/7.0)/7.0))/7.0)/7.0))/7.0)/7.0))/7.0)/7.0))/7.0)/7.0))/7.0)/7.0))/7.0)/7.0)))/5.0))/6.0))-(5.0/7.0))
+Given formula:
+(((x * 5) - 4) / 6)
+Num of necessary iterations:
+1000
+Fitness function:
+-1.0245719097390672e-16
+Calculation:
+[0.16666667 1.         1.83333333 2.66666667 3.5        4.33333333
+ 5.16666667 6.         6.83333333 7.66666667]
+Actual Y values:
+[0.16666667 1.         1.83333333 2.66666667 3.5        4.33333333
+ 5.16666667 6.         6.83333333 7.66666667]

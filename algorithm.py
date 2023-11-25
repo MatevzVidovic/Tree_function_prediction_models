@@ -1,4 +1,4 @@
-import pygad
+
 import matplotlib.pyplot as plt
 import pandas as pd
 from trees import *
@@ -16,10 +16,14 @@ class Parameters:
         self.new_chromosomes_proportion = 0.1
         self.mutation_prob = 0.1
         self.tournament_num_of_participants = 4
-        self.indep_prob = 0.2    # prob of choosing the indep vector when creating a new leaf (instead of a constant)
+        self.indep_prob = 0.2    # prob of choosing the indep vector when creating a new leaf (instead of a constant) and during mutation
         self.fitness_func_exponent = 1/3   # The exponent that is used on the num_of_operations
-
-
+        self.iterations_since_correct_equation = 20    # The number of iterations after we already have a positive fitness function. 
+                                                # This means we get the equation perfectly, we just want to search for a shorter solution.
+        self.varied_new_member_max_height = 7    # create_new_member_varied_size() creates trees recursively. This is the max size. of the tree that is allowed.
+        self.recursive_chance_is_leaf = 0.4    # As the tree is built recrsively, this is the chance that the new recursive node will be a leaf.
+        self.inserting_mutation_prob = 0.5   # When we perform a mutation, how likely is it, that the mutation will be an inserting one rather than a simple one.
+        self.elite_mutated_twins = True    # Do we perform the cloning of the elite, mutating it, and adding it to the population.
 
 ds = pd.read_csv('dataset.csv')
 eq = np.array(ds['Equation'])
@@ -150,11 +154,13 @@ def give_small_constant(length):
 #naredi random člana populacije
 def create_new_member(params: Parameters):
     
-    c = random.randint(0,1)
-    if (c == 0):
-        return create_new_member_3(params)
-    else:
-        return create_new_member_5(params)
+    return create_new_member_varied_size(params)
+
+    # c = random.randint(0,1)
+    # if (c == 0):
+    #     return create_new_member_3(params)
+    # else:
+    #     return create_new_member_5(params)
 
 
 #drevo velikosti 3
@@ -257,11 +263,75 @@ def create_new_member_5(params: Parameters):
 
 
 
+
+
+def create_new_member_varied_size(params: Parameters):
+    
+    indep_vector = X[XY_index]
+
+    new_tree = TreeContainer()
+    op1 = give_simple_operation()
+    
+    new_tree.ultimate_parent.set_left_child(TreeNode(False, None, op1))
+    
+    left_subtree = create_new_subtree_recursively(params.varied_new_member_max_height-1, params)
+    right_subtree = create_new_subtree_recursively(params.varied_new_member_max_height-1, params)
+
+    new_tree.ultimate_parent.children[0].set_left_child(left_subtree)
+    new_tree.ultimate_parent.children[0].set_right_child(right_subtree)
+    
+    #!!! treba je tole, da se update-a list_of_nodes
+    new_tree.update_list_of_nodes()
+
+    #print(const1)
+    #print(const2)
+    return new_tree
+
+
+
+def give_leaf(params):
+    
+    indep_vector = X[XY_index]
+
+    const1 = None
+    if (random.random() < params.indep_prob):
+        const1 = np.copy(indep_vector)
+    else: 
+        const1 = give_small_constant(indep_vector.size)
+    
+    return TreeNode(True, const1)
+
+
+def create_new_subtree_recursively(max_height_to_go, params: Parameters):
+    
+    # The default condition - prevents infinite trees.
+    if max_height_to_go <= 1:
+        return give_leaf(params)
+
+    if random.random() < params.recursive_chance_is_leaf:
+        return give_leaf(params)
+
+
+    # Now we are certain that this isn't a leaf.
+
+    operation = give_simple_operation()
+    current_node = TreeNode(False, None, operation)
+
+    if operation[1] == 2:
+        current_node.set_left_child(create_new_subtree_recursively(max_height_to_go-1, params))
+        current_node.set_right_child(create_new_subtree_recursively(max_height_to_go-1, params))
+    elif operation[1] == 1:
+        current_node.set_left_child(create_new_subtree_recursively(max_height_to_go-1, params))
+
+    return current_node
+    
+    
+
 # naredi začetno populacijo
 def create_starting_population(params: Parameters):
     population = []
 
-    print(params.pop_size)
+    # print(params.pop_size)
     for i in range(0, params.pop_size):
         population.append(create_new_member(params))
     return population
@@ -283,26 +353,40 @@ def tournement_get_2_children(population, params: Parameters):
     child1, child2 = crossover(tournament_participants[0], tournament_participants[1])
     return (child1, child2)
 
+def mutate(tree, params):
+    if params.inserting_mutation_prob < random.random():
+        tree.inserting_mutation(simple_elem_func_tuples, [give_small_constant(X[iteracija].size)])
+    else:
+        tree.simple_mutation(simple_elem_func_tuples, X[iteracija], [give_small_constant(X[iteracija].size)], params.indep_prob)
+    return
+
 
 
 def create_next_population(population, params: Parameters):
-    """
-    elitism: what percentage of the best gets kept
-    new_chromosomes_proportion: percentage of the next pop that will be made up by new random individuals
-    mutation_prob: chance that a child will also incur a mutation
-    """
-
+    
     # print(evaluation)
-    size = len(population)
+    # size = len(population)
     population.sort(reverse=True, key=lambda tree: fitness(tree, params))
 
-    evaluation = evaluate_population(population, params)
+    # evaluation = evaluate_population(population, params)
     # print(evaluation[0:5])
     # print("____________________________")
 
 
     # ohranimo najboljse (elitism)
-    next_population = population[0:int(len(population) * params.elitism)].copy()
+    elite = population[0:int(len(population) * params.elitism)].copy()
+    next_population = elite
+
+    if params.elite_mutated_twins:
+        mutated_elite = []
+        for i in elite:
+            # Here the .copy() is necessary. Otherwise we are mutating the elite itself
+            # since above only the pointers get copied, not the actual trees.
+            current_tree = i.copy()
+            mutate(current_tree, params)
+            mutated_elite.append(current_tree)
+            
+        next_population += mutated_elite
 
 
     for i in range(int(len(population) * params.new_chromosomes_proportion)):
@@ -321,10 +405,9 @@ def create_next_population(population, params: Parameters):
         child1, child2 = tournement_get_2_children(population, params)
 
         if (random.random() < params.mutation_prob):
-            child1.simple_mutation(simple_elem_func_tuples, X[iteracija], [give_small_constant(X[iteracija].size)], 0.3)
-
+            mutate(child1, params)
         if (random.random() < params.mutation_prob):
-            child2.simple_mutation(simple_elem_func_tuples, X[iteracija], [give_small_constant(X[iteracija].size)], 0.3)
+            mutate(child2, params)
 
         children.append(child1)
         children.append(child2)
@@ -342,22 +425,48 @@ def Genetic_Algorithm(params: Parameters):
     
     population = create_starting_population(params)
 
+    # This is only for accounting reasons.
+    # It changes if we end prematurely.
+    end_num_of_iterations = params.num_iterations
+
+    iters_since_positive_fitness = 0
     for i in range(0, params.num_iterations):
         population = create_next_population(population, params)
+        
+        # Checking if we already have the right equation:
+        if fitness(population[0], params) >= 0:
+            iters_since_positive_fitness += 1
+        if iters_since_positive_fitness >= params.iterations_since_correct_equation:
+            end_num_of_iterations = i
+            break
+        
         #for a in population:
             #print(a.calculate())
 
     #testing
-    print("Our formula:")
-    population[0].print()
-    print("Given formula:")
-    print(eq[XY_index])
-    print("Fitness function:")
-    print(fitness(population[0], params))
-    print("Calculation:")
-    print(population[0].calculate())
-    print("Actual Y values:")
-    print(Y[XY_index])
+    # print("-------------------------------------------------")
+    # print("Our formula:")
+    # population[0].print()
+    # print("Given formula:")
+    # print(eq[XY_index])
+    # print("Num of necessary iterations:")
+    # print(end_num_of_iterations)
+    # print("Fitness function:")
+    # print(fitness(population[0], params))
+    # print("Calculation:")
+    # print(population[0].calculate())
+    # print("Actual Y values:")
+    # print(Y[XY_index])
+    # print("-------------------------------------------------")
+    # print("\n\n")
+
+    our_formulas.append(population[0].to_string())
+    their_formulas.append(eq[XY_index])
+    needed_nums_of_iterations.append(end_num_of_iterations)
+    fitness_functions_of_best.append(fitness(population[0], params))
+    our_calculations.append(population[0].calculate())
+    their_calculations.append(Y[XY_index])
+
 
     return population[0]
 
@@ -371,32 +480,54 @@ def Genetic_Algorithm(params: Parameters):
 
 
 
+    
 
 
 parameters = Parameters()
-parameters.num_iterations=1000
+parameters.num_iterations=500
 parameters.pop_size=30
-parameters.elitism=0.1
-parameters.new_chromosomes_proportion=0.1
-parameters.mutation_prob=0.1
-parameters.tournament_num_of_participants=4
+parameters.elitism=0.1     # what percentage of the best gets kept.
+                            # Mind that this will take up 2*elitism of our new population, because of mutated twins of the elite.
+parameters.new_chromosomes_proportion=0.3    # percentage of the next pop that will be made up by new random individuals
+parameters.mutation_prob=0.1    # chance that a new child will incur a mutation
+parameters.tournament_num_of_participants=3    # 2 makes it just random, and 4 seemed to make it too hard for the bad to ever get a chance, so new ideas don't get created.
 parameters.indep_prob=0.2 # prob of choosing the indep vector when creating a new leaf (instead of a constant)
 parameters.fitness_func_exponent= 1/3    # The exponent that is used on the num_of_operations
-
-
+parameters.iterations_since_correct_equation = 100    # The number of iterations after we already have a positive fitness function. 
+                                                # This means we get the equation perfectly, we just want to search for a shorter solution.
+parameters.varied_new_member_max_height = 7    # create_new_member_varied_size() creates trees recursively. This is the max size. of the tree that is allowed.
+parameters.recursive_chance_is_leaf = 0.6    # As the tree is built recrsively, this is the chance that the new recursive node will be a leaf.
+parameters.inserting_mutation_prob = 0.5   # When we perform a mutation, how likely is it, that the mutation will be an inserting one rather than a simple one.
+parameters.elite_mutated_twins = True    # Do we perform the cloning of the elite, mutating it, and adding it to the population.
 
 print("--------------------------------------------------------")
 #test = create_new_member()
 #print(test.calculate())
 
 
+
+# accounting info to store results in:
+our_formulas = []
+their_formulas = []
+needed_nums_of_iterations = []
+fitness_functions_of_best = []
+our_calculations = []
+their_calculations = []
+
+
+
 # !!!!! To je sedaj nujna globalna spremenljivka, ki se povsod uporablja.
 # Razlog: itak ne bova izvajala nekega multithreadanja. Vseeno če prej nastaviva, pa ni treba potem podajat.
 XY_index = 0
 
-for i in range(50):
+for i in range(len(eq)):
     XY_index = i
     Genetic_Algorithm(parameters)
+
+
+is_correct_solution = np.array(needed_nums_of_iterations) < parameters.num_iterations
+num_of_correct_colutions = np.sum(is_correct_solution)
+print(num_of_correct_colutions)
 
 
 
@@ -420,6 +551,11 @@ diary:
     dodal funkcije create_new_member da lahko generira drevesa velikosti 5, zdaj je generiranje
     novega člena bolj naključno.
 
+    
+
+
+
+
     XY_index je sedaj globalna spremenljivka. Nikjer se je ne podaja.
     Preprosto olajša zadeve. Ker saj itak X in Y tudi globalno podajava.
     Pac ne delava huge projekta. Naj bodo dobre prakse za kdaj drugic.
@@ -431,4 +567,18 @@ diary:
     Pa tudi lazje je programirat, ce ves, na kaj se navezujes.
 
     Fitness function je dozivela spremembe. Se mi zdi, da kar okej deluje trenutno.
+
+    create_new_member_varied_size(params) rekurzivno zgradi novega memberja.
+    Vzema parametra:
+    - varied_new_member_max_height. Ta pove, kaj je maksimalna visina novega drevesa.
+    - recursive_chance_is_leaf.     Ko se drevo rekurzivno gradi, je za vsak nov node taksna moznost, da bo leaf, in ne se en operation node.
+    Vse nase operacije imajo 2 sinova, zato je moznost, da se drevo zakljuci na tem koraku, enaka: recursive_chance_is_leaf**2
+    Imamo pa (1-recursive_chance_is_leaf)**2 moznosti, da bosta oba sinova operaciji.
+    Če bomo torej recursive_chance_is_leaf prestavili na premajhno vrednost, bomo skoraj zagotoo dobili drevo z visino varied_new_member_max_height,
+    ker bo preprosto raslo tako globoko.
+
+    Dodal sem inserting_mutation. Ta ne samo spremeni ene od funkcij ali vrednosti, ampak vstavi nov node.
+
+    Problem je, da se samo otroci mutirajo. Nase najboljse resitve pa ostajajo enake.
+    Zato sem uvedel podvajanje vseh, ki ostanejo zaradi elitizma in na njih izvedel mutacijo.
 """
