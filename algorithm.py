@@ -1,5 +1,6 @@
 
 import matplotlib.pyplot as plt
+import seaborn as sns
 import pandas as pd
 from trees import *
 import random
@@ -135,6 +136,15 @@ def fitness(tree, params: Parameters):
         return float('-inf')
 
 
+# only used for display of the results, not in the algorithm
+def average_L1_error(tree):
+    dep_vector = Y[XY_index]
+    calc = tree.calculate()
+
+    L1_errors = np.abs(dep_vector - calc)
+    average_L1_error = np.sum(L1_errors / len(L1_errors))
+
+    return average_L1_error
 
 
 def give_simple_operation():
@@ -151,7 +161,7 @@ def give_small_constant(length):
     return c * np.ones(length)
 
 
-#naredi random člana populacije
+#naredi random clana populacije
 def create_new_member(params: Parameters):
     
     return create_new_member_varied_size(params)
@@ -462,6 +472,8 @@ def Genetic_Algorithm(params: Parameters):
 
     our_formulas.append(population[0].to_string())
     their_formulas.append(eq[XY_index])
+    lengths_of_our_formulas.append(len(population[0].list_of_nodes))
+    average_L1_errors.append(average_L1_error(population[0]))
     needed_nums_of_iterations.append(end_num_of_iterations)
     fitness_functions_of_best.append(fitness(population[0], params))
     our_calculations.append(population[0].calculate())
@@ -484,7 +496,7 @@ def Genetic_Algorithm(params: Parameters):
 
 
 parameters = Parameters()
-parameters.num_iterations=500
+parameters.num_iterations=1000
 parameters.pop_size=30
 parameters.elitism=0.1     # what percentage of the best gets kept.
                             # Mind that this will take up 2*elitism of our new population, because of mutated twins of the elite.
@@ -495,8 +507,11 @@ parameters.indep_prob=0.2 # prob of choosing the indep vector when creating a ne
 parameters.fitness_func_exponent= 1/3    # The exponent that is used on the num_of_operations
 parameters.iterations_since_correct_equation = 100    # The number of iterations after we already have a positive fitness function. 
                                                 # This means we get the equation perfectly, we just want to search for a shorter solution.
+
 parameters.varied_new_member_max_height = 7    # create_new_member_varied_size() creates trees recursively. This is the max size. of the tree that is allowed.
-parameters.recursive_chance_is_leaf = 0.6    # As the tree is built recrsively, this is the chance that the new recursive node will be a leaf.
+parameters.recursive_chance_is_leaf = 0.5    # As the tree is built recrsively, this is the chance that the new recursive node will be a leaf.
+                                            # 0.5 seems like a good value. 0.3 too little, 0.6 too much.
+
 parameters.inserting_mutation_prob = 0.5   # When we perform a mutation, how likely is it, that the mutation will be an inserting one rather than a simple one.
 parameters.elite_mutated_twins = True    # Do we perform the cloning of the elite, mutating it, and adding it to the population.
 
@@ -509,6 +524,8 @@ print("--------------------------------------------------------")
 # accounting info to store results in:
 our_formulas = []
 their_formulas = []
+lengths_of_our_formulas = []
+average_L1_errors = []
 needed_nums_of_iterations = []
 fitness_functions_of_best = []
 our_calculations = []
@@ -520,16 +537,80 @@ their_calculations = []
 # Razlog: itak ne bova izvajala nekega multithreadanja. Vseeno če prej nastaviva, pa ni treba potem podajat.
 XY_index = 0
 
-for i in range(len(eq)):
+num_of_equations_taken = len(eq)
+for i in range(num_of_equations_taken):
     XY_index = i
     Genetic_Algorithm(parameters)
 
 
+# print("Checking how well the varied_size member creation works:")
+# for i in range(30):
+#     create_new_member_varied_size(parameters).print()
+
+
 is_correct_solution = np.array(needed_nums_of_iterations) < parameters.num_iterations
-num_of_correct_colutions = np.sum(is_correct_solution)
-print(num_of_correct_colutions)
+print(is_correct_solution)
+is_wrong_solution = is_correct_solution == False
+print(is_wrong_solution)
 
 
+# For correct solutions histogram/piechart:
+num_of_correct_solutions = np.sum(is_correct_solution)
+num_of_wrong_solutions = len(needed_nums_of_iterations) - num_of_correct_solutions
+print("num_of_correct_colutions:")
+print(num_of_correct_solutions)
+print("num_of_correct_colutions:")
+print(num_of_wrong_solutions)
+
+# For line graph of length differences for the correct solutions:
+num_operations = num_operations[0:num_of_equations_taken]
+correct_solutions_length_difference = np.array(lengths_of_our_formulas) - np.array(num_operations)
+correct_solutions_length_difference = correct_solutions_length_difference[is_correct_solution]
+correct_solutions_length_difference.sort()
+print(correct_solutions_length_difference)
+
+# For scatter plot of needed_nums_of_iterations for the correct solutions:
+needed_nums_of_iterations = np.array(needed_nums_of_iterations)
+correct_solutions_needed_nums_of_iterations = needed_nums_of_iterations[is_correct_solution]
+correct_solutions_needed_nums_of_iterations.sort()
+print("correct_solutions_needed_nums_of_iterations:")
+print(correct_solutions_needed_nums_of_iterations)
+
+
+# For skatla z brki graph of errors for the wrong solutions:
+average_L1_errors = np.array(average_L1_errors)
+wrong_solutions_errors = average_L1_errors[is_wrong_solution]
+wrong_solutions_errors.sort()
+print("wrong_solutions_errors:")
+print(wrong_solutions_errors)
+
+
+
+
+# Piechart of correct solutions:
+plt.figure(figsize=(8, 8))
+plt.pie([num_of_correct_solutions, num_of_wrong_solutions], labels=["correct", "wrong"], autopct='%1.1f%%')
+plt.title("Correct solutions")
+plt.ylabel("")
+plt.show()
+
+# plt.plot(correct_solutions_length_difference)
+plt.scatter(range(len(correct_solutions_length_difference)), correct_solutions_length_difference, marker='o', s=25)
+plt.title("correct_solutions_length_difference")
+plt.ylabel("length difference")
+plt.show()
+
+plt.scatter(range(len(correct_solutions_needed_nums_of_iterations)), correct_solutions_needed_nums_of_iterations, marker='o', s=25)
+plt.title("Needed number of iterations:")
+plt.xlabel("")
+plt.ylabel("Number of iterations")
+plt.show()
+
+sns.boxplot(wrong_solutions_errors)
+plt.xlabel("")
+plt.ylabel("L1 errors")
+plt.title("L1 error of wrong solutions")
+plt.show()
 
 
 
