@@ -549,17 +549,17 @@ for i in range(num_of_equations_taken):
 
 
 is_correct_solution = np.array(needed_nums_of_iterations) < parameters.num_iterations
-print(is_correct_solution)
+# print(is_correct_solution)
 is_wrong_solution = is_correct_solution == False
-print(is_wrong_solution)
+# print(is_wrong_solution)
 
 
 # For correct solutions histogram/piechart:
 num_of_correct_solutions = np.sum(is_correct_solution)
 num_of_wrong_solutions = len(needed_nums_of_iterations) - num_of_correct_solutions
-print("num_of_correct_colutions:")
+# print("num_of_correct_colutions:")
 print(num_of_correct_solutions)
-print("num_of_correct_colutions:")
+# print("num_of_correct_colutions:")
 print(num_of_wrong_solutions)
 
 # For line graph of length differences for the correct solutions:
@@ -573,7 +573,7 @@ print(correct_solutions_length_difference)
 needed_nums_of_iterations = np.array(needed_nums_of_iterations)
 correct_solutions_needed_nums_of_iterations = needed_nums_of_iterations[is_correct_solution]
 correct_solutions_needed_nums_of_iterations.sort()
-print("correct_solutions_needed_nums_of_iterations:")
+# print("correct_solutions_needed_nums_of_iterations:")
 print(correct_solutions_needed_nums_of_iterations)
 
 
@@ -581,7 +581,7 @@ print(correct_solutions_needed_nums_of_iterations)
 average_L1_errors = np.array(average_L1_errors)
 wrong_solutions_errors = average_L1_errors[is_wrong_solution]
 wrong_solutions_errors.sort()
-print("wrong_solutions_errors:")
+# print("wrong_solutions_errors:")
 print(wrong_solutions_errors)
 
 
